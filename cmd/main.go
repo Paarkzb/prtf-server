@@ -10,19 +10,19 @@ import (
 
 const version = "1.0.0"
 
-type config struct {
+type Config struct {
 	port int
 	env  string
 }
 
-type applicaiton struct {
-	config   config
+type Applicaiton struct {
+	config   Config
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	version  string
 }
 
-func (app *applicaiton) serve() error {
+func (app *Applicaiton) serve() error {
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", app.config.port),
 		Handler:           app.routes(),
@@ -38,7 +38,7 @@ func (app *applicaiton) serve() error {
 }
 
 func main() {
-	cfg := config{
+	cfg := Config{
 		port: 8001,
 		env:  "development",
 	}
@@ -46,7 +46,7 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	app := &applicaiton{
+	app := &Applicaiton{
 		config:   cfg,
 		infoLog:  infoLog,
 		errorLog: errorLog,

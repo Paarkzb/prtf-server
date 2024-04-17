@@ -6,10 +6,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (app *applicaiton) routes() http.Handler {
+func (app *Applicaiton) routes() http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", app.quiz)
+	r.Get("/quiz", app.Quiz)
 
 	return r
 }
