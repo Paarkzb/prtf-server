@@ -27,7 +27,7 @@ func TestQuizHandler(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(app.Quiz)
+	handler := http.HandlerFunc(app.GetAllQuiz)
 
 	handler.ServeHTTP(rr, req)
 
