@@ -6,24 +6,30 @@ import (
 	"net/http"
 )
 
-type Quiz struct {
+type Question struct {
 	Id int32 `json:"id"`
 	Question string `json:"question"`
 	Answer string `json:"answer"`
 }
 
-func (app *Applicaiton) AddQuiz(w http.ResponseWriter, r *http.Request) {
-	var quizes = []Quiz{}
+type Quiz struct {
+	Questions []Question `json:"questions"`
+}
 
-	err := json.NewDecoder(r.Body).Decode(&quizes)
+func (app *Applicaiton) AddQuiz(w http.ResponseWriter, r *http.Request) {
+	var quiz Quiz
+
+	err := json.NewDecoder(r.Body).Decode(&quiz)
 	if err != nil{
 		app.errorLog.Println(err)
 		return
 	}
 
-	for quiz :=range quizes {
-		fmt.Println(quiz)
+	app.infoLog.Println("HERE")
+	for _, q :=range quiz.Questions {
+		app.infoLog.Println(q.Answer)
 	}
+	app.infoLog.Println("HERE")
 }
 
 func (app *Applicaiton) GetAllQuiz(w http.ResponseWriter, r *http.Request) {
