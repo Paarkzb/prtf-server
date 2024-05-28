@@ -26,6 +26,14 @@ type UpdateQuizInput struct {
 	Questions   *[]Question `json:"questions"`
 }
 
+type QuizList struct {
+	Id          uuid.UUID    `json:"id"`
+	User        UserResponse `json:"user"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Questions   []Question   `json:"questions"`
+}
+
 type Question struct {
 	Id     uuid.UUID `json:"id"`
 	Index  int       `json:"index"`

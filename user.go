@@ -8,3 +8,9 @@ type User struct {
 	Username string    `json:"username" binding:"required"`
 	Password string    `json:"password" binding:"required"`
 }
+
+type UserResponse struct {
+	Id       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	Username string    `json:"username"`
+}

@@ -21,7 +21,7 @@ func (s *QuizService) Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUID
 	return s.reps.Save(userId, quiz)
 }
 
-func (s *QuizService) GetAll(userId uuid.UUID) ([]prtf.Quiz, error) {
+func (s *QuizService) GetAll(userId uuid.UUID) ([]prtf.QuizList, error) {
 	return s.reps.GetAll(userId)
 }
 

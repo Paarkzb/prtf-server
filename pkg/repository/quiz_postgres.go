@@ -45,19 +45,26 @@ func (r *QuizPostgres) Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUI
 	return quizId, tx.Commit(context.Background())
 }
 
-func (r *QuizPostgres) GetAll(userId uuid.UUID) ([]prtf.Quiz, error) {
-	var quizes []prtf.Quiz
+func (r *QuizPostgres) GetAll(userId uuid.UUID) ([]prtf.QuizList, error) {
+	var quizes []prtf.QuizList
 
 	query := fmt.Sprintf(`
 		SELECT 
-			quiz.id, quiz.rf_user_id, quiz.name, quiz.description, quiz.questions
+			quiz.id as quiz_id, 
+			quiz.name as quiz_name, 
+			quiz.description as quiz_description, 
+			quiz.questions as quiz_question, 
+			u.id as user_id,
+			u.name as user_name,
+			u.username as user_username
 		FROM %s as quiz 
+		LEFT JOIN public.user as u ON u.id = quiz.rf_user_id
 		WHERE quiz.deleted=false`, quizTable)
 
 	rows, err := r.db.Query(context.Background(), query)
 	for rows.Next() {
-		var quiz prtf.Quiz
-		err = rows.Scan(&quiz.Id, &quiz.RfUserId, &quiz.Name, &quiz.Description, &quiz.Questions)
+		var quiz prtf.QuizList
+		err = rows.Scan(&quiz.Id, &quiz.Name, &quiz.Description, &quiz.Questions, &quiz.User.Id, &quiz.User.Name, &quiz.User.Username)
 		if err != nil {
 			return nil, err
 		}

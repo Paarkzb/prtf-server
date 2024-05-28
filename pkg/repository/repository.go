@@ -14,7 +14,7 @@ type Authorization interface {
 
 type Quiz interface {
 	Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUID, error)
-	GetAll(userId uuid.UUID) ([]prtf.Quiz, error)
+	GetAll(userId uuid.UUID) ([]prtf.QuizList, error)
 	GetById(userId, quizId uuid.UUID) (prtf.Quiz, error)
 	DeleteById(userId, quizId uuid.UUID) error
 	Update(userId, quizId uuid.UUID, input prtf.UpdateQuizInput) error

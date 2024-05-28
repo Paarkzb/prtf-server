@@ -34,7 +34,7 @@ func (h *Handler) saveQuiz(c *gin.Context) {
 }
 
 type getAllQuizResponse struct {
-	Data []prtf.Quiz `json:"data"`
+	Data []prtf.QuizList `json:"data"`
 }
 
 func (h *Handler) getAllQuiz(c *gin.Context) {
