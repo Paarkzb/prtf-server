@@ -1,0 +1,30 @@
+package repository
+
+import (
+	"prtf"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type Authorization interface {
+	CreateUser(user prtf.User) (uuid.UUID, error)
+	GetUser(username, password string) (prtf.User, error)
+}
+
+type Quiz interface {
+	Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUID, error)
+	GetAll(userId uuid.UUID) ([]prtf.Quiz, error)
+	GetById(userId, quizId uuid.UUID) (prtf.Quiz, error)
+	DeleteById(userId, quizId uuid.UUID) error
+	Update(userId, quizId uuid.UUID, input prtf.UpdateQuizInput) error
+}
+
+type Repository struct {
+	Authorization
+	Quiz
+}
+
+func NewRepository(pool *pgxpool.Pool) *Repository {
+	return &Repository{Authorization: NewAuthPostgres(pool), Quiz: NewQuizPostgres(pool)}
+}

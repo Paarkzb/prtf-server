@@ -1,14 +1,19 @@
+# go build -o ./dist/serverV2.exe ./cmd | .\dist\serverV2.exe
+
 build:
 	@echo building server
-	@go build -o dist/server.exe ./cmd
+	go build -o ./dist/serverV2.exe ./cmd
 	@echo server built
 
 start: build
 	@echo starting server
-	cmd /c start /B ./dist/server.exe
-	@echo server running
+	.\dist\serverV2.exe
+	@echo server started
 
-stop:
-	@echo stopping server
-	@taskkill /IM server.exe /F
-	@echo stopped server
+migrateup:
+	migrate -path db/migrations -database postgres://postgres:postgres@localhost:5436/postgres?sslmode=disable -verbose up $(v)
+
+migratedown:
+	migrate -path db/migrations -database postgres://postgres:postgres@localhost:5436/postgres?sslmode=disable -verbose down $(v)
+
+# migrate -path db/migrations -database postgres://postgres:postgres@localhost:5436/postgres?sslmode=disable version

@@ -1,73 +1,71 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+	"golang.org/x/net/context"
 	"os"
-	"prtf-server/internal/driver"
-	"prtf-server/internal/models"
-	"time"
+	"os/signal"
+	"prtf"
+	"prtf/pkg/handler"
+	"prtf/pkg/repository"
+	"prtf/pkg/service"
+	"syscall"
+
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
-const version = "1.0.0"
-
-type Config struct {
-	port int
-	env  string
-	db string
-}
-
-type Applicaiton struct {
-	config   Config
-	infoLog  *log.Logger
-	errorLog *log.Logger
-	DB models.DBModel
-	version  string
-}
-
-func (app *Applicaiton) serve() error {
-	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", app.config.port),
-		Handler:           app.routes(),
-		IdleTimeout:       30 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		ReadHeaderTimeout: 5 * time.Second,
-		WriteTimeout:      5 * time.Second,
-	}
-
-	app.infoLog.Printf(fmt.Sprintf("Starting HTTP server in %s mode on port %d", app.config.env, app.config.port))
-
-	return srv.ListenAndServe()
-}
-
 func main() {
-	cfg := Config{
-		port: 8001,
-		env:  "development",
-		db: "postgresql://postgres:postgres@localhost:5432/prtfdb?sslmode=disable",
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
 
-	infoLog := log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stdout, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile)
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("error loading .env file: %s", err.Error())
+	}
 
-	conn, err := driver.OpenDB(cfg.db)
+	dbconfig := repository.DBConfig{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
+	}
+	db, err := repository.NewPostgresDB(dbconfig)
 	if err != nil {
-		errorLog.Fatal(err)
-	}
-	defer conn.Close()
-
-	app := &Applicaiton{
-		config:   cfg,
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		DB: models.DBModel{DB: conn},
-		version:  version,
+		logrus.Fatal(err)
 	}
 
-	err = app.serve()
-	if err != nil {
-		app.errorLog.Println(err)
-		log.Fatal(err)
+	repos := repository.NewRepository(db)
+	serivces := service.NewService(repos)
+	handlers := handler.NewHandler(serivces)
+
+	srv := new(prtf.Server)
+	go func() {
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			logrus.Fatalf("error occured while running http server: %s", err.Error())
+		}
+	}()
+
+	logrus.Print("prtf-server started")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	logrus.Print("prtf-server shutting down")
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		logrus.Errorf("error occured on server shutting down: %s", err.Error())
 	}
+
+	db.Close()
+}
+
+func initConfig() error {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
