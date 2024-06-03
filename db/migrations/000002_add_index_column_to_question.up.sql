@@ -1,1 +1,0 @@
-ALTER TABLE IF EXISTS public.question ADD index int;

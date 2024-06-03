@@ -2,6 +2,7 @@ package prtf
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -26,12 +27,14 @@ type UpdateQuizInput struct {
 	Questions   *[]Question `json:"questions"`
 }
 
-type QuizList struct {
+type QuizResponse struct {
 	Id          uuid.UUID    `json:"id"`
 	User        UserResponse `json:"user"`
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Questions   []Question   `json:"questions"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 type Question struct {

@@ -21,11 +21,11 @@ func (s *QuizService) Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUID
 	return s.reps.Save(userId, quiz)
 }
 
-func (s *QuizService) GetAll(userId uuid.UUID) ([]prtf.QuizList, error) {
+func (s *QuizService) GetAll(userId uuid.UUID) ([]prtf.QuizResponse, error) {
 	return s.reps.GetAll(userId)
 }
 
-func (s *QuizService) GetById(userId, quizId uuid.UUID) (prtf.Quiz, error) {
+func (s *QuizService) GetById(userId, quizId uuid.UUID) (prtf.QuizResponse, error) {
 	return s.reps.GetById(userId, quizId)
 }
 
