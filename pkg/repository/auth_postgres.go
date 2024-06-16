@@ -37,3 +37,13 @@ func (r *AuthPostgres) GetUser(username, password string) (prtf.User, error) {
 
 	return user, err
 }
+
+func (r *AuthPostgres) GetUserById(id uuid.UUID) (prtf.UserResponse, error) {
+	var user prtf.UserResponse
+
+	query := fmt.Sprintf("SELECT id, name, username FROM %s WHERE id=$1", userTable)
+	
+	err := r.db.QueryRow(context.Background(), query, id).Scan(&user.Id, &user.Name, &user.Username)
+
+	return user, err
+}

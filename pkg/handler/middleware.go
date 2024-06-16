@@ -2,34 +2,24 @@ package handler
 
 import (
 	"errors"
-	"net/http"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"net/http"
 )
 
 const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userId"
+	userCtx = "userId"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
-	header := c.GetHeader(authorizationHeader)
-
-	if header == "" {
-		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
-		return
-	}
-
-	headerPart := strings.Split(header, " ")
-	if len(headerPart) != 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "token is empty")
 		return
 	}
 
 	// parse token
-	userId, err := h.service.Authorization.ParseToken(headerPart[1])
+	userId, err := h.service.Authorization.ParseToken(cookie)
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
@@ -45,11 +35,11 @@ func getUserId(c *gin.Context) (uuid.UUID, error) {
 		return uuid.Nil, errors.New("user id not found")
 	}
 
-	idInt, ok := id.(uuid.UUID)
+	idUUID, ok := id.(uuid.UUID)
 	if !ok {
 		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
 		return uuid.Nil, errors.New("user id is of invalid type")
 	}
 
-	return idInt, nil
+	return idUUID, nil
 }

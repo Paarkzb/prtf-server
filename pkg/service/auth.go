@@ -36,6 +36,16 @@ func (s *AuthService) CreateUser(user prtf.User) (uuid.UUID, error) {
 	return s.repo.CreateUser(user)
 }
 
+func (s *AuthService) GetUser(userId uuid.UUID) (prtf.UserResponse, error) {
+	user, err := s.repo.GetUserById(userId)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	// get user from db
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))

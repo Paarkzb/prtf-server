@@ -39,7 +39,7 @@ func (r *QuizPostgres) Save(userId uuid.UUID, quiz prtf.SaveQuizInput) (uuid.UUI
 	saveQuizQuery := fmt.Sprintf("INSERT INTO %s (rf_user_id, name, description, questions) VALUES($1, $2, $3, $4) RETURNING id", quizTable)
 	err = tx.QueryRow(context.Background(), saveQuizQuery, userId, quiz.Name, quiz.Description, quesitons).Scan(&quizId)
 	if err != nil {
-		tx.Rollback(context.Background())
+		_ = tx.Rollback(context.Background())
 		return uuid.Nil, err
 	}
 
@@ -62,7 +62,8 @@ func (r *QuizPostgres) GetAll(userId uuid.UUID) ([]prtf.QuizResponse, error) {
 			u.username as user_username
 		FROM %s as quiz 
 		LEFT JOIN public.user as u ON u.id = quiz.rf_user_id
-		WHERE quiz.deleted=false`, quizTable)
+		WHERE quiz.deleted=false
+		ORDER BY quiz.created_at DESC`, quizTable)
 
 	rows, err := r.db.Query(context.Background(), query)
 	for rows.Next() {
@@ -105,7 +106,7 @@ func (r *QuizPostgres) DeleteById(userId, quizId uuid.UUID) error {
 	quizQuery := fmt.Sprintf("UPDATE %s as q SET deleted=true WHERE q.id=$1", quizTable)
 	_, err = tx.Exec(context.Background(), quizQuery, quizId)
 	if err != nil {
-		tx.Rollback(context.Background())
+		_ = tx.Rollback(context.Background())
 		return err
 	}
 
@@ -154,7 +155,7 @@ func (r *QuizPostgres) Update(userId, quizId uuid.UUID, input prtf.UpdateQuizInp
 	_, err = tx.Exec(context.Background(), quizQuery, quizArgs...)
 	if err != nil {
 		logrus.Info("JERE")
-		tx.Rollback(context.Background())
+		_ = tx.Rollback(context.Background())
 		return err
 	}
 

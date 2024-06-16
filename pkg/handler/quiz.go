@@ -39,6 +39,7 @@ type getAllQuizResponse struct {
 
 func (h *Handler) getAllQuiz(c *gin.Context) {
 	userId, err := getUserId(c)
+
 	if err != nil {
 		return
 	}

@@ -9,6 +9,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user prtf.User) (uuid.UUID, error)
+	GetUser(userId uuid.UUID) (prtf.UserResponse, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (uuid.UUID, error)
 }

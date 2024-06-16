@@ -10,6 +10,7 @@ import (
 type Authorization interface {
 	CreateUser(user prtf.User) (uuid.UUID, error)
 	GetUser(username, password string) (prtf.User, error)
+	GetUserById(userId uuid.UUID) (prtf.UserResponse, error)
 }
 
 type Quiz interface {

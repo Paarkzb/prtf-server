@@ -43,5 +43,24 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{"token": token})
+	userId, err := h.service.Authorization.ParseToken(token)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user, err := h.service.Authorization.GetUser(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	_, err = c.Cookie("token")
+
+	if err != nil {
+		c.SetSameSite(http.SameSiteStrictMode)
+		c.SetCookie("token", token, 60*60*24, "/", "", true, true)
+	}
+
+	c.JSON(http.StatusOK, user)
 }
