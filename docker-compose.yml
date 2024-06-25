@@ -4,7 +4,6 @@ services:
       - prtf-postgres
     build:
       context: .
-    command: ["soda", "migrate", "up"]
     container_name: prtf-server
     hostname: prtf-server
     networks:
