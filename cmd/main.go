@@ -1,7 +1,6 @@
 package main
 
 import (
-	"golang.org/x/net/context"
 	"os"
 	"os/signal"
 	"prtf"
@@ -9,6 +8,8 @@ import (
 	"prtf/pkg/repository"
 	"prtf/pkg/service"
 	"syscall"
+
+	"golang.org/x/net/context"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -48,6 +49,7 @@ func main() {
 			logrus.Fatalf("error occured while running http server: %s", err.Error())
 		}
 	}()
+	logrus.Printf("server listening on port %s", viper.GetString("port"))
 
 	logrus.Print("prtf-server started")
 
@@ -66,6 +68,5 @@ func main() {
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }

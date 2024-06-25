@@ -1,9 +1,9 @@
-port: "8001"
+port: "8081"
 
 db:
   username: "postgres"
   password: "postgres"
-  host: "localhost"
-  port: "5436"
+  host: "prtf-postgres"
+  port: "5432"
   dbname: "postgres"
   sslmode: "disable"
