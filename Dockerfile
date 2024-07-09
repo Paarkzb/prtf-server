@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=build-stage /prtf-server /prtf-server
 
 # Bind TCP port
-EXPOSE 8080
+EXPOSE 8086
 
 # Run
 ENTRYPOINT [ "/prtf-server" ]

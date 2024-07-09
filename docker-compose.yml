@@ -9,7 +9,7 @@ services:
     networks:
       - prtf-net
     ports:
-      - 8081:8081
+      - 8086:8086
     volumes:
       - prtf-server-volume:/app
     deploy:
@@ -27,6 +27,9 @@ services:
       - 5436:5432
     volumes:
       - prtf-postgres-volume:/var/lib/postgresql/data
+    deploy:
+      restart_policy:
+        condition: on-failure
 
 volumes:
   prtf-postgres-volume:
